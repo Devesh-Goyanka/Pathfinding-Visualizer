@@ -1,0 +1,235 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#0b1220">
+  <meta name="description" content="An educational pathfinding website that visualizes BFS, DFS, Dijkstra's algorithm, and A* search on an interactive grid.">
+  <title>Pathfinding Visualizer Website | DSA Project</title>
+  <link rel="stylesheet" href="style.css">
+  <script defer src="algorithms.js"></script>
+  <script defer src="script.js"></script>
+</head>
+<body>
+  <div class="page-shell">
+    <header class="topbar">
+      <a class="brand" href="#top" aria-label="Pathfinding Visualizer home">
+        <span class="brand-mark" aria-hidden="true">
+          <svg viewBox="0 0 32 32" role="presentation">
+            <path d="M6 7h8v8H6zM18 7h8v8h-8zM6 19h8v8H6zM18 19h8v8h-8z" />
+            <path class="brand-route" d="M10 11h8v8h8" />
+          </svg>
+        </span>
+        <span class="brand-name">Path<span>Lab</span></span>
+      </a>
+      <div class="topbar-right">
+        <span class="topbar-tag"><span class="online-dot"></span> DSA PROJECT · INTERACTIVE WEBSITE</span>
+      </div>
+    </header>
+
+    <main id="top">
+      <section class="intro" aria-labelledby="page-title">
+        <div class="intro-copy">
+          <p class="eyebrow"><span class="eyebrow-line"></span> LEARN BY WATCHING THE SEARCH</p>
+          <h1 id="page-title">Pathfinding <span>Visualizer</span></h1>
+          <p class="intro-text">This interactive learning website shows how classic graph algorithms navigate a grid, work around walls, and build a route to the destination.</p>
+        </div>
+        <div class="intro-badge" aria-label="Four independently implemented algorithms">
+          <span class="intro-badge-number">04</span>
+          <span class="intro-badge-label">classic search<br>algorithms</span>
+        </div>
+      </section>
+
+      <section class="workspace" aria-label="Pathfinding visualizer workspace">
+        <aside class="sidebar" aria-label="Visualization controls and results">
+          <section class="panel controls-panel" aria-labelledby="controls-heading">
+            <div class="panel-heading">
+              <div>
+                <p class="section-kicker">SET UP A SEARCH</p>
+                <h2 id="controls-heading">Controls</h2>
+              </div>
+              <span class="heading-icon" aria-hidden="true">⌘</span>
+            </div>
+
+            <div class="field-group">
+              <label for="algorithmSelect">Pathfinding algorithm</label>
+              <select id="algorithmSelect" name="algorithm">
+                <option value="bfs">Breadth-First Search (BFS)</option>
+                <option value="dfs">Depth-First Search (DFS)</option>
+                <option value="dijkstra">Dijkstra's Algorithm</option>
+                <option value="astar">A* Search</option>
+              </select>
+              <p id="algorithmDescription" class="algorithm-description">Explores the grid one step layer at a time with a queue. Finds a shortest route when every move has equal cost.</p>
+              <div class="algorithm-meta">
+                <span id="algorithmGuarantee" class="meta-chip">Shortest route: yes</span>
+                <span id="algorithmComplexity" class="meta-chip">O(V + E)</span>
+              </div>
+            </div>
+
+            <div class="button-stack">
+              <button id="visualizeButton" class="button button-primary" type="button">
+                <span class="button-symbol" aria-hidden="true">▶</span>
+                <span>Visualize path</span>
+              </button>
+              <button id="pauseButton" class="button button-secondary" type="button" disabled>
+                <span class="button-symbol" aria-hidden="true">Ⅱ</span>
+                <span>Pause animation</span>
+              </button>
+            </div>
+
+            <div class="control-divider"></div>
+
+            <div class="field-group speed-group">
+              <div class="label-row">
+                <label for="speedRange">Animation speed</label>
+                <output id="speedValue" for="speedRange">82%</output>
+              </div>
+              <input id="speedRange" type="range" min="1" max="100" value="82" aria-describedby="speedHint">
+              <div class="range-endpoints"><span>Slow</span><span id="speedHint">Fast</span></div>
+            </div>
+
+            <div class="control-divider"></div>
+
+            <div class="secondary-actions" aria-label="Grid actions">
+              <button id="clearPathButton" class="button button-quiet" type="button" title="Remove explored and path colors but keep walls and endpoints">
+                <span aria-hidden="true">◌</span> Clear path
+              </button>
+              <button id="randomButton" class="button button-quiet" type="button" title="Generate random walls while keeping at least one route open">
+                <span aria-hidden="true">▦</span> Random obstacles
+              </button>
+              <button id="resetButton" class="button button-quiet button-reset" type="button" title="Restore the original empty grid and endpoint positions">
+                <span aria-hidden="true">↺</span> Reset grid
+              </button>
+            </div>
+          </section>
+
+          <section class="panel results-panel" aria-labelledby="results-heading">
+            <div class="panel-heading results-heading">
+              <div>
+                <p class="section-kicker">LIVE RUN SUMMARY</p>
+                <h2 id="results-heading">Results</h2>
+              </div>
+              <span id="routeBadge" class="route-badge" data-state="idle">READY</span>
+            </div>
+            <div class="status-line" aria-live="polite" aria-atomic="true">
+              <span class="status-indicator" aria-hidden="true"></span>
+              <p id="statusMessage">Choose an algorithm and press Visualize path.</p>
+            </div>
+            <div class="progress-track" aria-hidden="true"><span id="progressBar"></span></div>
+            <p id="statsAlgorithm" class="stats-algorithm">Selected: Breadth-First Search (BFS)</p>
+            <div class="stats-grid" aria-label="Search statistics">
+              <div class="stat-card">
+                <span class="stat-label">Discovered</span>
+                <strong id="statDiscovered" class="stat-value">—</strong>
+                <span class="stat-note">added to frontier</span>
+              </div>
+              <div class="stat-card">
+                <span class="stat-label">Processed</span>
+                <strong id="statProcessed" class="stat-value">—</strong>
+                <span class="stat-note">removed and checked</span>
+              </div>
+              <div class="stat-card">
+                <span class="stat-label">Explored shown</span>
+                <strong id="statShown" class="stat-value">—</strong>
+                <span class="stat-note">animated non-endpoints</span>
+              </div>
+              <div class="stat-card">
+                <span class="stat-label">Path nodes</span>
+                <strong id="statPathNodes" class="stat-value">—</strong>
+                <span class="stat-note">includes start + goal</span>
+              </div>
+              <div class="stat-card">
+                <span class="stat-label">Path moves</span>
+                <strong id="statMoves" class="stat-value">—</strong>
+                <span class="stat-note">steps after the start</span>
+              </div>
+              <div class="stat-card">
+                <span class="stat-label">Search time</span>
+                <strong id="statTime" class="stat-value">—</strong>
+                <span class="stat-note">algorithm only · ms</span>
+              </div>
+            </div>
+          </section>
+        </aside>
+
+        <section class="panel board-panel" aria-labelledby="board-heading">
+          <div class="board-header">
+            <div class="board-title-group">
+              <div class="board-icon" aria-hidden="true">
+                <svg viewBox="0 0 24 24"><path d="M4 4h6v6H4zM14 4h6v6h-6zM4 14h6v6H4zM14 14h6v6h-6z" /></svg>
+              </div>
+              <div>
+                <p class="section-kicker">INTERACTIVE CANVAS</p>
+                <h2 id="board-heading">Grid map</h2>
+              </div>
+            </div>
+            <div class="board-badges">
+              <span class="movement-badge"><span class="movement-dot"></span> 4-way movement</span>
+              <span id="gridSizeBadge" class="grid-size-badge">20 × 30</span>
+            </div>
+          </div>
+
+          <div class="grid-shell" id="gridShell">
+            <div id="grid" class="grid" role="grid" aria-label="20 row by 30 column pathfinding grid. Start is green, destination is red. Click or drag to draw walls." aria-rowcount="20" aria-colcount="30"></div>
+          </div>
+
+          <div class="board-hint">
+            <span class="hint-icon" aria-hidden="true">✦</span>
+            <p><strong>Try it:</strong> click or drag to draw walls. Drag the green start or red destination to move it. On a touch screen, tap cells to toggle walls.</p>
+          </div>
+
+          <div class="legend" aria-label="Grid legend">
+            <span class="legend-item"><span class="legend-swatch swatch-start">S</span> Start</span>
+            <span class="legend-item"><span class="legend-swatch swatch-goal">G</span> Destination</span>
+            <span class="legend-item"><span class="legend-swatch swatch-wall"></span> Wall</span>
+            <span class="legend-item"><span class="legend-swatch swatch-visited"></span> Explored</span>
+            <span class="legend-item"><span class="legend-swatch swatch-path"></span> Final path</span>
+          </div>
+
+          <div class="board-footer">
+            <span><span class="footer-dot"></span> Each move costs 1</span>
+            <span>Diagonals are disabled</span>
+            <span>Start <kbd>S</kbd> &nbsp; Goal <kbd>G</kbd></span>
+          </div>
+        </section>
+      </section>
+
+      <section class="learning-section" aria-labelledby="learning-heading">
+        <div class="learning-heading">
+          <p class="section-kicker">WHAT POWERS THIS WEBSITE</p>
+          <h2 id="learning-heading">The DSA behind every move</h2>
+          <p>Each colour on the grid comes from a data structure or a step in the graph search. These cards give a quick explanation before you explore the code and report.</p>
+        </div>
+        <div class="learning-grid">
+          <article class="learning-card">
+            <span class="learning-number">01 / MODEL</span>
+            <h3>Grid as a graph</h3>
+            <p>A two-dimensional array stores each cell. Open cells act as vertices; legal up, down, left, and right steps act as edges. A wall blocks that cell from neighbour generation.</p>
+          </article>
+          <article class="learning-card">
+            <span class="learning-number">02 / FRONTIER</span>
+            <h3>Queue and stack</h3>
+            <p>BFS uses a first-in, first-out queue to search in distance layers. DFS uses a last-in, first-out stack and a direction cursor to follow one branch, then backtrack.</p>
+          </article>
+          <article class="learning-card">
+            <span class="learning-number">03 / PRIORITY</span>
+            <h3>Min-heap</h3>
+            <p>Dijkstra and A* share a min-heap priority queue implemented in JavaScript. Dijkstra orders by cost so far; A* orders by cost so far plus Manhattan distance.</p>
+          </article>
+          <article class="learning-card">
+            <span class="learning-number">04 / ROUTE</span>
+            <h3>Visited and parent</h3>
+            <p>Visited flags prevent repeated work. Cost arrays track best-known distances, and parent indices let the website trace backward from the goal and draw the final route.</p>
+          </article>
+        </div>
+        <div class="learning-note"><strong>Guarantee reminder:</strong> BFS, Dijkstra, and Manhattan A* return an optimal route under this website's four-way, unit-cost rules. DFS can find a route, but it does not guarantee the shortest one.</div>
+      </section>
+
+      <footer class="page-footer">
+        <span>Built to make graph search easier to see, test, and explain.</span>
+        <span class="footer-course">DATA STRUCTURES &amp; ALGORITHMS</span>
+      </footer>
+    </main>
+  </div>
+</body>
+</html>
